@@ -111,4 +111,51 @@ void ozaki_scheme_ii(double* A, double* B, size_t M, size_t N, size_t K,
     __int128 MM = 1;
     for(int m : moduli)
         MM *= m;
+    const __int128 half_MM = MM / 2;
+
+    int k = (int)((std::log2((double)MM) - 1 - std::log2((double)K)) / 2);
+    int kA, kB;
+    kA = kB = std::min(k, 53);
+    assert(((__int128)K << (kA + kB)) < half_MM);   // CRT uniqueness
+
+    vector<int64_t> A_int, B_int;
+    vector<int> shiftA = scalefpmat2int(A, M, k, kA, 1, A_int.data());
+    vector<int> shiftB = scalefpmat2int(B, M, k, kB, 0, B_int.data());
+
+    vector<__int128> W;
+    for(int m : moduli)
+    {
+        __int128 Mt = MM / m;
+        W.push_back(Mt * mod_inverse((Mt % m), m));
+    }
+
+    vector<__int128> Z(M * N, 0);
+    vector<int32_t>  Ct(M * N);
+
+    for(int t = 0; t < s; t++)
+    {
+        residual_matmul(A_int.data(), B_int.data(), M, N, K, moduli[t], Ct.data());
+        for(size_t i = 0; i < M * N; i++)
+        {
+            int32_t u = Ct[i] % moduli[t];
+            if(u < 0) u += moduli[t];
+            Z[i] += (__int128)u * W[t];
+        }
+    }
+
+    for(auto& z : Z)
+    {
+        z %= MM;
+        if(z > half_MM) z -= MM;
+    }
+
+    for(size_t i = 0; i < M; i++)
+    {
+        for(size_t j = 0; j < N; j++)
+        {
+            size_t idx = i * N + j;
+            C[idx] = std::ldexp((double)Z[idx], -(shiftA[i] + shiftB[j]));
+        }
+    }
+
 }
