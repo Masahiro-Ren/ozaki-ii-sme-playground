@@ -1,6 +1,11 @@
 #include "matmul.hpp"
-
 #include <arm_sme.h>
+
+
+size_t sme_svl_bytes()
+{
+    return svcntsb();
+}
 
 __arm_locally_streaming __arm_new("za")
 void smopa_matmul_s8(const int8_t* A, const int8_t* B,
