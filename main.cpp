@@ -60,6 +60,7 @@ void sme_check()
 
 int main()
 {
+    // Checking SME 
     sme_check();
 
     constexpr size_t M = 256;
