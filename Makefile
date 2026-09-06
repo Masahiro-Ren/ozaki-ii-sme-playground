@@ -19,11 +19,10 @@ ozaki-ii.o: ozaki-ii.cpp ozaki-ii.hpp matmul.hpp
 matmul.o: matmul.cpp matmul.hpp
 	$(CXX) $(CXXFLAGS) $(SMEFLAGS) -c -o $@ $<
 
-run: test_scale main
-	./test_scale
-	./main
+run: ozksme
+	./ozksme
 
 clean:
 	rm -f ozksme *.o c_ref.bin c_ozaki.bin
 
-.PHONY: run clean
+.PHONY: all run clean
