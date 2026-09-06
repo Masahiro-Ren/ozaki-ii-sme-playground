@@ -1,17 +1,19 @@
 # ozaki-scheme-ii-sme
 
-Just for fun: running Ozaki Scheme II on ARM SME.
+*Just for fun*: running Ozaki Scheme II on ARM SME.
 Built and tested on an Apple M5 Pro.
+
+This repository is an independent experiment and is not affiliated with the official Ozaki Scheme II implementation.
 
 ## Project Structure
 ```
 /
-├── ozaki-ii.py    # Python version of Ozaki Scheme II, written to verify my understanding
-├── main.cpp       # Entry point: runs a 256x256x256 matmul demo
-├── matmul.cpp     # int8 matmul kernel on the SME unit (SMOPA)
-├── matmul.hpp     # kernel interface
-├── ozaki-ii.cpp   # Ozaki Scheme II in C++
-├── ozaki-ii.hpp   # scheme interface
+├── playground/ozaki-ii.py    # Python implementation used to verify the algorithm
+├── main.cpp                  # Entry point: runs a 256x256x256 matmul demo
+├── matmul.cpp                # int8 matmul kernel on the SME unit (SMOPA)
+├── matmul.hpp                # Kernel interface
+├── ozaki-ii.cpp              # Ozaki Scheme II in C++
+├── ozaki-ii.hpp              # Scheme interface
 └── Makefile
 ```
 
@@ -32,5 +34,5 @@ You will see a report in the console and two binary result files,
 - [ARM SME programming (ACLE intrinsics)](https://developer.arm.com/...) — the kernel's instruction set
 
 ## See Also
-- [GEMMul8](https://github.com/RIKEN-RCCS/GEMMul8) — the official, production Ozaki Scheme II library (CUDA/HIP)
+- [GEMMul8](https://github.com/RIKEN-RCCS/GEMMul8) — the official implementation maintained by the Ozaki Scheme II developers
 
