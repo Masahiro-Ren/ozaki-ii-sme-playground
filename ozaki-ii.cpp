@@ -6,7 +6,7 @@ using std::vector;
 vector<int> pick_moduli(size_t s)
 {
     vector<int> moduli;
-    for(int m = 256; moduli.size() < s && m >=2; --m)
+    for(int m = 256; moduli.size() < s && m >= 2; --m)
     {
         bool coprime = true;
         for(int prev : moduli)
@@ -93,6 +93,8 @@ void residual_matmul(const int64_t* A_int, const int64_t* B_int,
                      size_t M, size_t N, size_t K,
                      int m, int32_t* C)
 {
+    assert(K < (size_t)1 << 17);
+
     vector<int8_t> Ar(M * K);
     vector<int8_t> Br(K * N);
 
@@ -102,8 +104,8 @@ void residual_matmul(const int64_t* A_int, const int64_t* B_int,
     smopa_matmul_s8(Ar.data(), Br.data(), M, N, K, C);
 }
 
-void ozaki_scheme_ii(double* A, double* B, size_t M, size_t N, size_t K,
-                     int s, double* C)
+void ozaki_scheme_ii(const double* A, const double* B, size_t M, size_t N, size_t K,
+                     size_t s, double* C)
 {
     assert(s <= 14);
     vector<int> moduli = pick_moduli(s);
@@ -118,9 +120,10 @@ void ozaki_scheme_ii(double* A, double* B, size_t M, size_t N, size_t K,
     kA = kB = std::min(k, 53);
     assert(((__int128)K << (kA + kB)) < half_MM);   // CRT uniqueness
 
-    vector<int64_t> A_int, B_int;
-    vector<int> shiftA = scalefpmat2int(A, M, k, kA, 1, A_int.data());
-    vector<int> shiftB = scalefpmat2int(B, M, k, kB, 0, B_int.data());
+    vector<int64_t> A_int(M * K);
+    vector<int64_t> B_int(K * N);
+    vector<int> shiftA = scalefpmat2int(A, M, K, kA, 1, A_int.data());
+    vector<int> shiftB = scalefpmat2int(B, K, N, kB, 0, B_int.data());
 
     vector<__int128> W;
     for(int m : moduli)
@@ -132,7 +135,7 @@ void ozaki_scheme_ii(double* A, double* B, size_t M, size_t N, size_t K,
     vector<__int128> Z(M * N, 0);
     vector<int32_t>  Ct(M * N);
 
-    for(int t = 0; t < s; t++)
+    for(size_t t = 0; t < s; t++)
     {
         residual_matmul(A_int.data(), B_int.data(), M, N, K, moduli[t], Ct.data());
         for(size_t i = 0; i < M * N; i++)
