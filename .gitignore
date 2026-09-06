@@ -70,3 +70,7 @@ Testing/
 
 # clangd
 compile_flags.txt
+
+# results
+c_ozaki.bin
+c_ref.bin
